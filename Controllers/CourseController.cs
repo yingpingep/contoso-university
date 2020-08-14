@@ -111,6 +111,20 @@ namespace contoso_university.Controllers
             return Ok();
         }
 
+        // GET api/course/
+        [HttpGet("vw/students")]
+        public ActionResult<IEnumerable<VwCourseStudents>> GetCourseStudents()
+        {
+            return _context.VwCourseStudents.ToArray();
+        }
+
+        // GET api/course/
+        [HttpGet("vw/studentcount")]
+        public ActionResult<IEnumerable<VwCourseStudentCount>> GetCourseStudentCount()
+        {
+            return _context.VwCourseStudentCount.ToArray();
+        }
+
         private bool CheckCourseExist(int id) {
             return _context.Course.Any(course => course.CourseId == id);
         }
