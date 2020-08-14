@@ -30,8 +30,7 @@ namespace contoso_university
             services.AddControllers();
             // using Microsoft.EntityFrameworkCore; 
             services.AddDbContext<ContosoUniversityContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
