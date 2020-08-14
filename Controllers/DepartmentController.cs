@@ -107,5 +107,12 @@ namespace contoso_university.Controllers
 
             return Ok();
         }
+
+        // GET api/department/
+        [HttpGet("vw/coursecount")]
+        public ActionResult<IEnumerable<VwDepartmentCourseCount>> GetDepartmentCourseCount()
+        {
+            return _context.VwDepartmentCourseCount.FromSqlInterpolated($"SELECT * FROM dbo.vwDepartmentCourseCount").ToArray();
+        }
     }
 }
