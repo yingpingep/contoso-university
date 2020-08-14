@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using contoso_university.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace contoso_university.Controllers
 {
@@ -11,40 +13,106 @@ namespace contoso_university.Controllers
     [ApiController]
     public class CourseInstructorController : ControllerBase
     {
-        public CourseInstructorController()
+        private readonly ContosoUniversityContext _context;
+
+        public CourseInstructorController(ContosoUniversityContext context)
         {
+            _context = context;
         }
 
-        // GET api/courseinstructor
+        // GET api/CourseInstructor
         [HttpGet("")]
         public ActionResult<IEnumerable<CourseInstructor>> GetCourseInstructors()
         {
-            return new List<CourseInstructor> { };
+            return _context.CourseInstructor.ToArray();
         }
 
-        // GET api/courseinstructor/5
+        // GET api/CourseInstructor/5
         [HttpGet("{id}")]
-        public ActionResult<CourseInstructor> GetCourseInstructorById(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult<CourseInstructor>> GetCourseInstructorById(int id)
         {
-            return null;
+            var CourseInstructor = await _context.CourseInstructor.FindAsync(id);
+
+            if (CourseInstructor == null) {
+                return NotFound();
+            }
+
+            return CourseInstructor;
         }
 
-        // POST api/courseinstructor
+        // POST api/CourseInstructor
         [HttpPost("")]
-        public void PostCourseInstructor(CourseInstructor value)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesDefaultResponseType]
+        public async Task<ActionResult<CourseInstructor>> PostCourseInstructor(CourseInstructor CourseInstructor)
         {
+            _context.CourseInstructor.Add(CourseInstructor);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetCourseInstructorById", new { id = CourseInstructor.CourseId }, CourseInstructor);
         }
 
-        // PUT api/courseinstructor/5
+        // PUT api/CourseInstructor/5
         [HttpPut("{id}")]
-        public void PutCourseInstructor(int id, CourseInstructor value)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> PutCourseInstructor(int id, CourseInstructor patchCourseInstructor)
         {
+            if (id != patchCourseInstructor.CourseId) {
+                return BadRequest();
+            }
+
+            _context.Entry(patchCourseInstructor).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (System.Exception)
+            {
+                if (CheckCourseInstructorExist(id)) {
+                    return NotFound();
+                }
+                throw;
+            }
+            return Ok();
         }
 
-        // DELETE api/courseinstructor/5
+        // DELETE api/CourseInstructor/5
         [HttpDelete("{id}")]
-        public void DeleteCourseInstructorById(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
+        public async Task<IActionResult> DeleteCourseInstructorById(int id)
         {
+            var CourseInstructor = await _context.CourseInstructor.FindAsync(id);
+            if (CourseInstructor == null) {
+                return NotFound();
+            }
+
+            _context.Remove(CourseInstructor).State = EntityState.Deleted;
+            
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (System.Exception)
+            {
+                if (CheckCourseInstructorExist(id)) {
+                    return NotFound();
+                }
+                throw;
+            }
+            return Ok();
+        }
+
+        private bool CheckCourseInstructorExist(int id) {
+            return _context.CourseInstructor.Any(CourseInstructor => CourseInstructor.CourseId == id);
         }
     }
 }
