@@ -47,10 +47,10 @@ namespace contoso_university.Controllers
         [HttpPost("")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesDefaultResponseType]
-        public async Task<ActionResult<Course>> PostCourse(Course course)
+        public ActionResult<Course> PostCourse(Course course)
         {
             _context.Course.Add(course);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return CreatedAtAction("GetCourseById", new { id = course.CourseId }, course);
         }
@@ -61,7 +61,7 @@ namespace contoso_university.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> PutCourse(int id, Course patchCourse)
+        public IActionResult PutCourse(int id, Course patchCourse)
         {
             if (id != patchCourse.CourseId) {
                 return BadRequest();
@@ -71,13 +71,14 @@ namespace contoso_university.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (System.Exception)
-            {
                 if (CheckCourseExist(id)) {
                     return NotFound();
                 }
+                
+                _context.SaveChanges();
+            }
+            catch (System.Exception)
+            {
                 throw;
             }
             return Ok();
@@ -99,7 +100,7 @@ namespace contoso_university.Controllers
             
             try
             {
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             catch (System.Exception)
             {

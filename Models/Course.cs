@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace contoso_university.Models
 {
-    public partial class Course
+    public partial class Course : IDateModified
     {
         public Course()
         {
